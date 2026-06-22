@@ -9,7 +9,7 @@
             <div className="flex gap-5">
                 <h2><Link to={'/'}>Todo</Link></h2>
                 <h2><Link to={'/Calendar'}>Calendar</Link></h2>
-                <h2>Skills</h2>
+                <h2><Link to={'/Skill'}>Skills</Link></h2>
             </div>
 
             <label>

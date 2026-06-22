@@ -3,6 +3,7 @@ import Mainpage from './pages/Mainpage.jsx'
 import Nav from './components/Nav.jsx'
 import {useState, useEffect} from 'react';
 import Calendar from './features/Calendar/Calendar.jsx';
+import Skill from './features/skills/Skill.jsx';
 
 export default function App()  {
     //------Dark mode
@@ -38,6 +39,7 @@ export default function App()  {
         <Routes>
           <Route path="/" element={<Mainpage />} />
           <Route path='/Calendar' element={<Calendar />} />
+          <Route path='/Skill' element={<Skill />} />
         </Routes>
       </div>
 
