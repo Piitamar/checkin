@@ -1,167 +1,49 @@
-﻿import { useMemo, useState } from "react";
+﻿import { useState } from "react";
+import CreateSkillModal from "./CreateSkillModal.jsx";
 import AddSubSkillModal from "./AddSubSkillModal.jsx";
 import SkillGroups from "./SkillGroups.jsx";
-
-const initialSkills = [
-  {
-    id: 1,
-    name: "UI/UX Design",
-    level: 1,
-    maxXp: 1000,
-    accent: "from-navyblue via-normalblue to-lightpink",
-    subSkills: [
-      {
-        id: "ui-grid",
-        name: "Grid System",
-        xp: 0,
-        maxXp: 100,
-        addPoints: 10,
-        doneAt: 100,
-      },
-      {
-        id: "ui-colors",
-        name: "Color Logic",
-        xp: 0,
-        maxXp: 100,
-        addPoints: 15,
-        doneAt: 100,
-      },
-      {
-        id: "ui-figma",
-        name: "Figma Flow",
-        xp: 0,
-        maxXp: 100,
-        addPoints: 10,
-        doneAt: 100,
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "CLI Mastery",
-    level: 1,
-    maxXp: 100,
-    accent: "from-darkblue via-normalblue to-hazyblue",
-    subSkills: [
-      {
-        id: "cli-git",
-        name: "Git Flow",
-        xp: 45,
-        maxXp: 100,
-        addPoints: 12,
-        doneAt: 100,
-      },
-      {
-        id: "cli-pnpm",
-        name: "PNPM Speed",
-        xp: 20,
-        maxXp: 100,
-        addPoints: 8,
-        doneAt: 100,
-      },
-      {
-        id: "cli-scripts",
-        name: "Scripts",
-        xp: 80,
-        maxXp: 100,
-        addPoints: 20,
-        doneAt: 100,
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: "Drawing",
-    level: 1,
-    maxXp: 100,
-    accent: "from-pinky via-lightpink to-screenblue",
-    subSkills: [
-      {
-        id: "draw-lines",
-        name: "Line Control",
-        xp: 95,
-        maxXp: 100,
-        addPoints: 5,
-        doneAt: 100,
-      },
-      {
-        id: "draw-shade",
-        name: "Shading",
-        xp: 50,
-        maxXp: 100,
-        addPoints: 10,
-        doneAt: 100,
-      },
-      {
-        id: "draw-color",
-        name: "Color Study",
-        xp: 75,
-        maxXp: 100,
-        addPoints: 15,
-        doneAt: 100,
-      },
-    ],
-  },
-];
-
-const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-
-const createNewSubSkill = (skill, payload = {}) => {
-  const nextIndex = skill.subSkills.length + 1;
-
-  return {
-    id: `${skill.id}-custom-${nextIndex}`,
-    name: payload.name?.trim() || `New Skill ${nextIndex}`,
-    xp: 0,
-    maxXp: 100,
-    addPoints: Math.max(1, Number(payload.addPoints) || 10),
-    doneAt: 100,
-  };
-};
+import useSkill from "./useSkill.jsx";
+import useSubskill from "./useSubskill.jsx";
+import useSkills from "./useSkills.jsx";
 
 export default function Skill() {
-  const [skills, setSkills] = useState(initialSkills);
+  const { skills, setSkills } = useSkill();
+  const { subSkill, setSubskill } = useSubskill();
+  const { addSkill, deleteSkill, addSubskill, deleteSubskill, addXPToSubskill, decreaseXPToSubskill } = useSkills();
+  
   const [collapsedGroups, setCollapsedGroups] = useState({});
+  const [isCreateSkillModalOpen, setIsCreateSkillModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [activeGroupId, setActiveGroupId] = useState(null);
 
-  const groupStats = useMemo(
-    () =>
-      skills.map((skill) => {
-        const xp = skill.subSkills.reduce((sum, subSkill) => sum + subSkill.xp, 0);
-        const percent = skill.maxXp === 0 ? 0 : Math.min(100, Math.round((xp / skill.maxXp) * 100));
-        const displayLevel = skill.level + Math.floor(percent / 100);
+  const addXPToSubSkill = async (groupId, subSkillId) => {
+    //thêm xp vào db
+    const data = await addXPToSubskill(groupId, subSkillId);
+    if (!data) return;
 
-        return {
-          ...skill,
-          xp,
-          percent,
-          displayLevel,
-        };
-      }),
-    [skills]
-  );
+    //update state
+    setSubskill((prev) =>
+      prev.map((item) => (item.id === data.subSkill.id ? data.subSkill : item))
+    );
 
-  const addXPToSubSkill = (bigSkillId, subSkillId) => {
     setSkills((prev) =>
-      prev.map((skill) => {
-        if (skill.id !== bigSkillId) return skill;
-
-        return {
-          ...skill,
-          subSkills: skill.subSkills.map((subSkill) => {
-            if (subSkill.id !== subSkillId) return subSkill;
-
-            return {
-              ...subSkill,
-              xp: clamp(subSkill.xp + subSkill.addPoints, 0, subSkill.maxXp),
-            };
-          }),
-        };
-      })
+      prev.map((item) => (item.id === data.skill.id ? data.skill : item))
     );
   };
 
+  const decreaseXPToSubSkill = async (groupId, subSkillId) => {
+    const data = await decreaseXPToSubskill(groupId, subSkillId);
+    if (!data) return;
+
+    setSubskill((prev) =>
+      prev.map((item) => (item.id === data.subSkill.id ? data.subSkill : item))
+    );
+
+    setSkills((prev) =>
+      prev.map((item) => (item.id === data.skill.id ? data.skill : item))
+    );
+  };
+    
   const toggleGroup = (bigSkillId) => {
     setCollapsedGroups((prev) => ({
       ...prev,
@@ -169,9 +51,56 @@ export default function Skill() {
     }));
   };
 
+  const addSubSkill = async (groupId, payload) => {
+    const newSubSkill = await addSubskill(groupId, payload);
+    if (!newSubSkill) return false;
+
+    setSubskill((prev) => [...prev, newSubSkill]);
+    return true;
+  };
+
+  const deleteSubSkill = async (groupId, subSkillId) => {
+    const deleted = await deleteSubskill(groupId, subSkillId);
+    if (!deleted) return false;
+
+    setSubskill((prev) => prev.filter((item) => item.id !== deleted.subSkill.id));
+
+    setSkills((prev) =>
+      prev.map((item) => (item.id === deleted.skill.id ? deleted.skill : item))
+    );
+
+    return true;
+  };
+
+  const createNewSkill = async (payload) => {
+    const newSkill = await addSkill(payload);
+    if (!newSkill) return false;
+
+    setSkills((prev) => [...prev, newSkill]);
+    return true;
+  };
+
+  const deleteSkillGroup = async (skillId) => {
+    const deleted = await deleteSkill(skillId);
+    if (!deleted) return false;
+
+    setSkills((prev) => prev.filter((item) => item.id !== deleted.skill.id));
+    setSubskill((prev) => prev.filter((item) => item.skill_id !== deleted.skill.id));
+
+    if (activeGroupId === deleted.skill.id) {
+      closeAddSubSkillModal();
+    }
+
+    return true;
+  };
+
   const openAddSubSkillModal = (bigSkillId) => {
     setActiveGroupId(bigSkillId);
     setIsAddModalOpen(true);
+  };
+
+  const openCreateSkillModal = () => {
+    setIsCreateSkillModalOpen(true);
   };
 
   const closeAddSubSkillModal = () => {
@@ -179,29 +108,8 @@ export default function Skill() {
     setActiveGroupId(null);
   };
 
-  const addSubSkill = (bigSkillId, payload = {}) => {
-    setSkills((prev) =>
-      prev.map((skill) => {
-        if (skill.id !== bigSkillId) return skill;
-
-        return {
-          ...skill,
-          subSkills: [...skill.subSkills, createNewSubSkill(skill, payload)],
-        };
-      })
-    );
-  };
-
-  const confirmAddSubSkill = ({ name, addPoints }) => {
-    if (activeGroupId == null) return;
-    addSubSkill(activeGroupId, { name, addPoints });
-    closeAddSubSkillModal();
-  };
-
-  const restart = () => {
-    setSkills(initialSkills);
-    setCollapsedGroups({});
-    closeAddSubSkillModal();
+  const closeCreateSkillModal = () => {
+    setIsCreateSkillModalOpen(false);
   };
 
   return (
@@ -213,25 +121,49 @@ export default function Skill() {
               Skill progress
             </h1>
             <button
-              onClick={restart}
+              onClick={openCreateSkillModal}
               className="rounded-full bg-darkblue px-4 py-2 text-sm font-semibold text-lightwhite transition hover:bg-navyblue"
             >
-              Reset demo
+              Create new skill
             </button>
           </div>
 
           <SkillGroups
-            data={{ groupStats, collapsedGroups }}
-            actions={{ toggleGroup, openAddSubSkillModal, addXPToSubSkill }}
+            data={{ skills, subSkill, collapsedGroups }}
+            actions={{
+              toggleGroup,
+              openAddSubSkillModal,
+              addXPToSubSkill,
+              decreaseXPToSubSkill,
+              deleteSkillGroup,
+              deleteSubSkill,
+            }}
           />
 
           <AddSubSkillModal
             open={isAddModalOpen}
             onClose={closeAddSubSkillModal}
-            onConfirm={confirmAddSubSkill}
+            onConfirm={async (payload) => {
+              if (activeGroupId == null) return;
+              const created = await addSubSkill(activeGroupId, payload);
+              if (created) {
+                closeAddSubSkillModal();
+              }
+            }}
             groupName={
-              groupStats.find((group) => group.id === activeGroupId)?.name ?? ""
+              skills.find((group) => group.id === activeGroupId)?.name ?? ""
             }
+          />
+
+          <CreateSkillModal
+            open={isCreateSkillModalOpen}
+            onClose={closeCreateSkillModal}
+            onConfirm={async (payload) => {
+              const created = await createNewSkill(payload);
+              if (created) {
+                closeCreateSkillModal();
+              }
+            }}
           />
         </div>
       </div>

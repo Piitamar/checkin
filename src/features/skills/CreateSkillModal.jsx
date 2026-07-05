@@ -1,6 +1,6 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function AddSubSkillModal({ open, onClose, onConfirm, groupName }) {
+export default function CreateSkillModal({ open, onClose, onConfirm }) {
   const [name, setName] = useState("");
   const [addPoints, setAddPoints] = useState(10);
 
@@ -46,7 +46,7 @@ export default function AddSubSkillModal({ open, onClose, onConfirm, groupName }
       >
         <div className="flex items-start justify-between gap-4">
           <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-            {groupName}
+            Create new skill
           </h2>
 
           <button
@@ -66,14 +66,14 @@ export default function AddSubSkillModal({ open, onClose, onConfirm, groupName }
             <input
               value={name}
               onChange={(event) => setName(event.target.value)}
-              placeholder="e.g. Layout Review"
+              placeholder="e.g. Communication"
               className="w-full rounded-2xl border border-darkblue/10 bg-white px-4 py-3 text-sm outline-none transition focus:border-darkblue/30"
             />
           </label>
 
           <label className="block">
             <span className="mb-2 block text-sm font-semibold text-darkblue">
-              XP mỗi lần click
+              XP per click
             </span>
             <input
               type="number"
@@ -83,6 +83,10 @@ export default function AddSubSkillModal({ open, onClose, onConfirm, groupName }
               className="w-full rounded-2xl border border-darkblue/10 bg-white px-4 py-3 text-sm outline-none transition focus:border-darkblue/30"
             />
           </label>
+
+          <div className="rounded-2xl bg-white px-4 py-3 text-sm text-darkblue/70 ring-1 ring-darkblue/10">
+            Max HP is fixed at 1000
+          </div>
         </div>
 
         <div className="mt-6 flex items-center justify-end gap-3">
@@ -98,7 +102,7 @@ export default function AddSubSkillModal({ open, onClose, onConfirm, groupName }
             onClick={submit}
             className="rounded-full bg-darkblue px-5 py-2 text-sm font-semibold text-lightwhite transition hover:bg-navyblue"
           >
-            OK
+            Create
           </button>
         </div>
       </div>

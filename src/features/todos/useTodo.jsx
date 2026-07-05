@@ -13,6 +13,7 @@ export default function useTodo() {
       }
   
       fetchData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return { todos, setTodos };
