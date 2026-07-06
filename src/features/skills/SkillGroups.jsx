@@ -28,23 +28,6 @@ export default function SkillGroups({ data, actions }) {
               <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
                 {group.name}
               </h2>
-
-              <div className="mt-5">
-                <div className="h-4 overflow-hidden rounded-full bg-white/75 ring-1 ring-white/70">
-                  <div
-                    className={'h-full rounded-full bg-linear-to-r bg-soft transition-[width] duration-500 ease-out'}
-                    style={{ width: `${percent}%` }}
-                  />
-                </div>
-                <div className="mt-2 flex items-center justify-between text-xs text-darkblue/55">
-                  <p>
-                    {group.exp} / {group.maxhp} XP
-                  </p>
-                  <span>
-                    {isCollapsed ? "Click to show details" : "Click to hide details"}
-                  </span>
-                </div>
-              </div>
             </button>
 
             <div className="absolute right-5 top-5 flex items-center gap-2 sm:right-6 sm:top-6">
@@ -64,6 +47,28 @@ export default function SkillGroups({ data, actions }) {
                 delete
               </button>
             </div>
+
+            <button className="mt-5 w-full"
+                  type="button"
+                  onClick={() => toggleGroup(group.id)}>
+              <div className="flex items-center justify-between gap-4">
+                <div className="h-4 overflow-hidden w-full rounded-full bg-white/75 ring-1 ring-white/70">
+                  <div
+                    className={'h-full rounded-full bg-linear-to-r bg-soft transition-[width] duration-500 ease-out'}
+                    style={{ width: `${percent}%` }}
+                  />
+                </div>
+              </div>
+
+                <div className="mt-2 flex items-center justify-between text-xs text-darkblue/55">
+                  <p>
+                    {group.exp} / {group.maxhp} XP
+                  </p>
+                  <span>
+                    {isCollapsed ? "Click to show details" : "Click to hide details"}
+                  </span>
+                </div>
+            </button>
 
             <div
               className={`grid transition-all duration-300 ease-out ${

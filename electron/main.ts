@@ -100,7 +100,7 @@ ipcMain.handle('markDone-todo', async (_event, state, id) => {
 ipcMain.handle('get-skill', async () => {
   try {
     const res = await pool.query(
-      'SELECT * FROM skill'
+      'SELECT * FROM skill ORDER BY id ASC'
     )
     return res.rows
   } catch (err:unknown) {

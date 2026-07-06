@@ -2,7 +2,7 @@
 
 export default function AddSubSkillModal({ open, onClose, onConfirm, groupName }) {
   const [name, setName] = useState("");
-  const [addPoints, setAddPoints] = useState(10);
+  const [addPoints, setAddPoints] = useState(20);
 
   useEffect(() => {
     const onKeyDown = (event) => {

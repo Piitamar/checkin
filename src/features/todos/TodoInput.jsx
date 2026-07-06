@@ -2,7 +2,7 @@ export default function TodoInput( {text, setText, onAdd, toast}) {
     return (
         <form className="m-20 mb-10 flex h-40 min-h-40 min-w-140 max-w-200 flex-col justify-between rounded-2xl border-[1px] border-white/70 bg-pastel p-10 pb-5 opacity-80 shadow-[5px_10px_20px_#d0b1b850] backdrop-blur-2xl">
         <input
-          placeholder="Hom nay ban muon lam gi?"
+          placeholder="Hôm nay bạn muốn làm gì?"
           value={text}
           toast={toast}
           onChange={(e) => setText(e.target.value)}
