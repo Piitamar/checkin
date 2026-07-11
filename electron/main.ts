@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, Notification } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import pg from 'pg'
@@ -345,6 +345,25 @@ ipcMain.handle('decrease-xp-to-subskill', async (_, groupId, subSkillId) => {
   } catch (err: unknown) {
     return { success: false, error: (err as Error).message }
   }
+})
+
+ipcMain.handle('show-notification', async (_event, payload) => {
+  const title = typeof payload?.title === 'string' && payload.title.trim() ? payload.title.trim() : 'CHECKIN'
+  const body = typeof payload?.body === 'string' && payload.body.trim() ? payload.body.trim() : 'Your session has finished.'
+
+  if (!Notification.isSupported()) {
+    return { success: false, error: 'Desktop notifications are not supported on this device' }
+  }
+
+  const notification = new Notification({
+    title,
+    body,
+    silent: false,
+  })
+
+  notification.show()
+
+  return { success: true }
 })
 
 app.on('window-all-closed', () => {

@@ -31,6 +31,10 @@ export default function Focus() {
           window.clearInterval(timer)
           setIsRunning(false)
           setIsFinished(true)
+          window.api?.showNotification?.({
+            title: 'Focus session finished',
+            body: `Your ${selectedMinutes}-minute focus session is done.`,
+          })
           return 0
         }
 
@@ -39,7 +43,7 @@ export default function Focus() {
     }, 1000)
 
     return () => window.clearInterval(timer)
-  }, [isRunning])
+  }, [isRunning, selectedMinutes])
 
   const handleStart = () => {
     const initialSeconds = selectedMinutes * 60
