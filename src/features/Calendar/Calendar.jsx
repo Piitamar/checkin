@@ -27,7 +27,7 @@ export default function Calendar() {
           >
             Prev
           </button>
-          <h1 className='text-base font-medium text-darkblue/80'>
+          <h1 className='text-base dark:text-lightwhite font-medium text-darkblue/80'>
             {weekDate}, ngày {date} tháng {month} năm {year}
           </h1>
           <button

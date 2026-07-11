@@ -4,6 +4,7 @@ import Nav from './components/Nav.jsx'
 import {useState, useEffect} from 'react';
 import Calendar from './features/Calendar/Calendar.jsx';
 import Skill from './features/skills/Skill.jsx';
+import Focus from './features/focus/Focus.jsx';
 
 export default function App()  {
     //------Dark mode
@@ -19,16 +20,18 @@ export default function App()  {
     }
 
     useEffect(() => {
-    if (mode == MODE.DARK) {
-      document.body.style.backgroundImage = "linear-gradient(to top,#d4cad2 5%,#33374e 100%)"
-      document.body.style.color = "white";
-    } 
-    if (mode == MODE.LIGHT) {
-      document.body.style.backgroundColor = "#f0f2f4"; 
-      document.body.style.backgroundImage = "none";
-      document.body.style.color = "#495977";
-    }
-  });
+      const root = document.documentElement; 
+      
+      if (mode === MODE.DARK) {
+        root.classList.add('dark');
+        document.body.style.backgroundImage = "linear-gradient(to top,#d4cad2 5%,#33374e 100%)"
+        document.body.style.color = "white";
+      } else {
+        root.classList.remove('dark');
+        document.body.style.backgroundColor = "#f0f2f4";
+        document.body.style.backgroundImage = "none";
+        document.body.style.color = "#495977";}
+    }, [mode]);
  
   //--------MAIN----------------------------------------------------
   return (
@@ -40,6 +43,7 @@ export default function App()  {
           <Route path="/" element={<Mainpage />} />
           <Route path='/Calendar' element={<Calendar />} />
           <Route path='/Skill' element={<Skill />} />
+          <Route path='/Focus' element={<Focus />} />
         </Routes>
       </div>
 
