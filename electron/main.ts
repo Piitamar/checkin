@@ -26,6 +26,8 @@ function createWindow() {
   win = new BrowserWindow({
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
+      contextIsolation: true,
+      nodeIntegration: false,
     },
   })
 
@@ -347,24 +349,15 @@ ipcMain.handle('decrease-xp-to-subskill', async (_, groupId, subSkillId) => {
   }
 })
 
-ipcMain.handle('show-notification', async (_event, payload) => {
-  const title = typeof payload?.title === 'string' && payload.title.trim() ? payload.title.trim() : 'CHECKIN'
-  const body = typeof payload?.body === 'string' && payload.body.trim() ? payload.body.trim() : 'Your session has finished.'
-
-  if (!Notification.isSupported()) {
-    return { success: false, error: 'Desktop notifications are not supported on this device' }
+//cổng notification
+ipcMain.handle("show-notification", (_, payload) => {
+  if (Notification.isSupported()) {
+    new Notification({
+      title: payload.title,
+      body: payload.body
+    }).show();
   }
-
-  const notification = new Notification({
-    title,
-    body,
-    silent: false,
-  })
-
-  notification.show()
-
-  return { success: true }
-})
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -379,4 +372,50 @@ app.on('activate', () => {
   }
 })
 
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+      createWindow();
+})
+
+let popupWindow: BrowserWindow | null = null;
+
+function createPopup() {
+  popupWindow = new BrowserWindow({
+    width: 300,
+    height: 300,
+
+    frame: false,
+    transparent: true,
+    resizable: false,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    maximizable:false,
+    minimizable:false,
+    roundedCorners: true,
+
+    webPreferences: {
+      preload: path.join(__dirname, "../preload/index.js"),
+    },
+  });
+
+  if (VITE_DEV_SERVER_URL) {
+    popupWindow.loadURL(`${VITE_DEV_SERVER_URL}?popup=true`);
+  } else {
+    popupWindow.loadFile(
+      path.join(RENDERER_DIST, "index.html"),
+      {
+        search: "?popup=true",
+      }
+    );
+  }
+
+  setTimeout(() => {
+    popupWindow?.close();
+    popupWindow = null;
+  }, 7000);
+}
+
+ipcMain.handle("popup",()=>{
+
+    createPopup()
+
+})

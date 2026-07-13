@@ -41,6 +41,5 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.invoke('add-xp-to-subskill', groupId, subSkillId),
   decreaseXPToSubskill: (groupId: number, subSkillId: number) =>
     ipcRenderer.invoke('decrease-xp-to-subskill', groupId, subSkillId),
-  showNotification: (payload: { title: string; body: string }) =>
-    ipcRenderer.invoke('show-notification', payload),
+  showPopup:()=>ipcRenderer.invoke("popup")
 })
