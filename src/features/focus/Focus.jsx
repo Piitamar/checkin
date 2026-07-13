@@ -44,6 +44,8 @@ export default function Focus() {
         setIsRunning(false);
         setIsFinished(true);
         setSecondsLeft(timeLeftSeconds);
+        window.api.showPopup();
+        alarm.play().catch(console.error);
       } else {
         setSecondsLeft(timeLeftSeconds);
       }
@@ -71,12 +73,6 @@ export default function Focus() {
     setIsFinished(false);
     setIsRunning(false);
   }
-
-  useEffect(() => {
-    if (!isFinished) return 
-    window.api.showPopup();
-    alarm.play().catch(console.error);
-  }, [isFinished, alarm, selectedMinutes]);
 
   return (
     <main className="focusPage relative w-screen mx-auto h-113 mt-10 ">
