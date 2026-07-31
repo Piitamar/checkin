@@ -6,6 +6,7 @@ import Calendar from './features/Calendar/Calendar.jsx';
 import Skill from './features/skills/Skill.jsx';
 import Focus from './features/focus/Focus.jsx';
 import Popup from './components/Popup.jsx';
+import Game from './game/Game.jsx';
 
 export default function App() {
   const isPopup = new URLSearchParams(window.location.search).get("popup") === "true";
@@ -41,7 +42,7 @@ export default function App() {
   //--------MAIN----------------------------------------------------
   return (
     <HashRouter>
-      {location.pathname !== "#/popup" && (
+      {location.pathname !== "#/popup" && window.location.hash !== "#/Game" && (
         <Nav mode={mode} toggle={toggle} />
       )}
 
@@ -51,9 +52,9 @@ export default function App() {
           <Route path='/Calendar' element={<Calendar />} />
           <Route path='/Skill' element={<Skill />} />
           <Route path='/Focus' element={<Focus />} />
+          <Route path='/Game' element={<Game />} />
         </Routes>
       </div>
-
     </HashRouter>
   )
 }

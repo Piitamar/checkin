@@ -19,9 +19,10 @@ export default function Nav({ mode, toggle }) {
         <h2><Link to={'/Calendar'}>Calendar</Link></h2>
         <h2><Link to={'/Skill'}>Skills</Link></h2>
         <h2><Link to={'/Focus'}>Focus</Link></h2>
+        <h2 className="font-bold text-pinky"><Link to={'/Game'}>Game</Link></h2>
       </div>
 
-      <div className="ml-70 rounded-xl whitespace-nowrap bg-pinky/70 px-5 py-1 pb-1.5 text-lightwhite shadow-xl shadow-pink-100/10">
+      <div className="ml-60 rounded-xl whitespace-nowrap bg-pinky/70 px-5 py-1 pb-1.5 text-lightwhite shadow-xl shadow-pink-100/10">
         {gold} gold
       </div>
 
