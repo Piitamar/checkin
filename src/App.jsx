@@ -1,4 +1,4 @@
-import { HashRouter, Route, Routes } from 'react-router-dom'
+import { HashRouter, Route, Routes, useLocation } from 'react-router-dom'
 import Mainpage from './pages/Mainpage.jsx'
 import Nav from './components/Nav.jsx'
 import { useState, useEffect } from 'react';
@@ -7,6 +7,17 @@ import Skill from './features/skills/Skill.jsx';
 import Focus from './features/focus/Focus.jsx';
 import Popup from './components/Popup.jsx';
 import Game from './game/Game.jsx';
+
+function PersistentFocus() {
+  const location = useLocation();
+  const isVisible = location.pathname === '/Focus';
+
+  return (
+    <div className={isVisible ? '' : 'hidden'}>
+      <Focus />
+    </div>
+  );
+}
 
 export default function App() {
   const isPopup = new URLSearchParams(window.location.search).get("popup") === "true";
@@ -46,12 +57,13 @@ export default function App() {
         <Nav mode={mode} toggle={toggle} />
       )}
 
+      <PersistentFocus />
+
       <div className="App">
         <Routes>
           <Route path="/" element={<Mainpage />} />
           <Route path='/Calendar' element={<Calendar />} />
           <Route path='/Skill' element={<Skill />} />
-          <Route path='/Focus' element={<Focus />} />
           <Route path='/Game' element={<Game />} />
         </Routes>
       </div>

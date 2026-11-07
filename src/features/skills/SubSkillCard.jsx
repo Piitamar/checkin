@@ -36,7 +36,7 @@ export default function SubSkillCard({ subSkill, onAddXP, onDecreaseXP, onDelete
                 onDelete(subSkill.id);
               }
             }}
-            className="rounded-full bg-white px-3 py-1.5 text-[11px] font-semibold transition hover:bg-rose-50"
+            className="rounded-full text-darkblue bg-white px-3 py-1.5 text-[11px] font-semibold transition hover:bg-rose-50"
           >
             delete
           </button>

@@ -7,7 +7,9 @@ export default function useHeatmapData() {
 
   const heatmapData = {}
   for (const [rawDate, items] of Object.entries(groupData || {})) {
-    const count = items.filter(item => item?.markdone).length
+    const count = items.filter(item => {
+      return item?.markdone && !item.track_only
+    }).length
     heatmapData[rawDate] = {
       count,
       color: count === 0
@@ -17,10 +19,10 @@ export default function useHeatmapData() {
           : count === 2
             ? 'bg-[#FECBCB]'
             : count === 3
-                ? 'bg-[#F1B3B8]'
-                : count === 4
-                ?'bg-[#f49399]'
-                    :'bg-white'
+              ? 'bg-[#F1B3B8]'
+              : count === 4
+                ? 'bg-[#f49399]'
+                : 'bg-white'
     }
   }
 

@@ -8,12 +8,12 @@ export default function Nav({ mode, toggle }) {
   const [gold, setGold] = useState(0);
 
   useEffect(() => {
-    const totalSkillExp = skills.reduce((sum, skill) => sum + Number(skill.exp || 0), 0);
+    const totalSkillExp = skills.reduce((sum, skill) => sum + Number(skill.exp + (skill.level - 1) * 1000) || 0, 0);
     setGold(totalSkillExp);
   }, [skills]);
 
   return (
-    <nav className="flex h-5 w-full flex-row items-center justify-between">
+    <nav className="flex h-5 w-full items-center justify-between">
       <div className="flex gap-5">
         <h2><Link to={'/'}>Todo</Link></h2>
         <h2><Link to={'/Calendar'}>Calendar</Link></h2>
@@ -22,7 +22,7 @@ export default function Nav({ mode, toggle }) {
         <h2 className="font-bold text-pinky"><Link to={'/Game'}>Game</Link></h2>
       </div>
 
-      <div className="ml-60 rounded-xl whitespace-nowrap bg-pinky/70 px-5 py-1 pb-1.5 text-lightwhite shadow-xl shadow-pink-100/10">
+      <div className="ml-58 mr-3 rounded-xl whitespace-nowrap bg-pinky/70 px-5 py-1 pb-1.5 text-lightwhite shadow-xl shadow-pink-100/10">
         {gold} gold
       </div>
 

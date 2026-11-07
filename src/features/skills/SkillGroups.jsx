@@ -7,7 +7,7 @@ export default function SkillGroups({ data, actions }) {
   return (
     <div className="grid gap-5">
       {skills.map((group) => {
-        const isCollapsed = collapsedGroups[group.id] ?? false;
+        const isCollapsed = collapsedGroups[group.id] ?? true ;
         const currentSubSkills = subSkill.filter(sub => sub.skill_id === group.id);
         const percent = Math.min((group.exp / group.maxhp) * 100, 100);
 

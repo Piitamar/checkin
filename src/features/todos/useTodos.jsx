@@ -9,8 +9,8 @@ export default function useTodos() {
     return []
   }
 
-  async function createTodo(text) {
-    const result = await window.api.addTodo(text)
+  async function createTodo(text, trackOnly) {
+    const result = await window.api.addTodo({ todo: text, trackOnly });
     if (result.success) {
       return result
     }
@@ -33,5 +33,13 @@ export default function useTodos() {
     return { success: false, error: result.error }
   }
 
-  return {createTodo, loadTodos, deleteTodo, markDoneTodo }
+  async function updateTrackOnly(state, id) {
+    const result = await window.api.updateTrackOnly(state, id)
+    if (result.success) {
+      return result
+    }
+    return { success: false, error: result.error }
+  }
+
+  return {createTodo, loadTodos, deleteTodo, markDoneTodo, updateTrackOnly }
 }

@@ -1,6 +1,6 @@
 import CheckinCard from "./Checkincard";
 
-export default function TodoList({ group, onDelete, onMarkDone }) {
+export default function TodoList({ group, onDelete, onMarkDone, onToggleTrackOnly }) {
   return (
     <div className='flex flex-col w-100 gap-4 items-center justify-center'>
         {Object.keys(group).length > 0 ? (
@@ -9,7 +9,7 @@ export default function TodoList({ group, onDelete, onMarkDone }) {
               <h2 className="text-darkblue text-s m-2 pl-90">{date}</h2>
               <div className="flex gap-2 justify-center flex-wrap">
                 {items.map((item) => (
-                  <CheckinCard key={item.id} item={item} onDelete={onDelete} onMarkDone={onMarkDone} />
+                  <CheckinCard key={item.id} item={item} onDelete={onDelete} onMarkDone={onMarkDone} onToggleTrackOnly={onToggleTrackOnly} />
                 ))}
               </div>
             </div>

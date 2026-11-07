@@ -24,10 +24,11 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 })
 
 contextBridge.exposeInMainWorld('api', {
-  addTodo: (data: { todo: string }) => ipcRenderer.invoke('add-todo', data),
+  addTodo: (data: { todo: string, trackOnly: boolean }) => ipcRenderer.invoke('add-todo', data),
   getTodo: () => ipcRenderer.invoke('get-todo'),
   deleteTodo: (id: number) => ipcRenderer.invoke('delete-todo', id),
   markDoneTodo: (state: boolean, id: number) => ipcRenderer.invoke('markDone-todo', state, id),
+  updateTrackOnly: (state: boolean, id: number) => ipcRenderer.invoke('update-track-only', state, id),
   fetchSkill: () => ipcRenderer.invoke('get-skill'),
   fetchSubskill: () => ipcRenderer.invoke('get-subskill'),
   addSkill: (payload: { name: string; addPoints: number }) =>
@@ -41,5 +42,7 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.invoke('add-xp-to-subskill', groupId, subSkillId),
   decreaseXPToSubskill: (groupId: number, subSkillId: number) =>
     ipcRenderer.invoke('decrease-xp-to-subskill', groupId, subSkillId),
+  increaseSkillLevel: (skillId: number) => 
+    ipcRenderer.invoke('increase-skill-level', skillId),
   showPopup:()=>ipcRenderer.invoke("popup")
 })

@@ -43,7 +43,6 @@ export default function Focus() {
         setSecondsLeft(0);
         setIsRunning(false);
         setIsFinished(true);
-        setSecondsLeft(timeLeftSeconds);
         window.api.showPopup();
         alarm.play().catch(console.error);
       } else {

@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useRef, useState } from "react";
 import CreateSkillModal from "./CreateSkillModal.jsx";
 import AddSubSkillModal from "./AddSubSkillModal.jsx";
 import SkillGroups from "./SkillGroups.jsx";
@@ -9,26 +9,46 @@ import useSkills from "./useSkills.jsx";
 export default function Skill() {
   const { skills, setSkills } = useSkill();
   const { subSkill, setSubskill } = useSubskill();
-  const { addSkill, deleteSkill, addSubskill, deleteSubskill, addXPToSubskill, decreaseXPToSubskill } = useSkills();
-  
+  const { addSkill, deleteSkill, addSubskill, deleteSubskill, addXPToSubskill, decreaseXPToSubskill, increaseSkillLevel } = useSkills();
+
   const [collapsedGroups, setCollapsedGroups] = useState({});
   const [isCreateSkillModalOpen, setIsCreateSkillModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [activeGroupId, setActiveGroupId] = useState(null);
+  const xpRequestsInFlight = useRef(new Set());
 
   const addXPToSubSkill = async (groupId, subSkillId) => {
-    //thêm xp vào db
-    const data = await addXPToSubskill(groupId, subSkillId);
-    if (!data) return;
+    if (xpRequestsInFlight.current.has(groupId)) return;
+    xpRequestsInFlight.current.add(groupId);
 
-    //update state
-    setSubskill((prev) =>
-      prev.map((item) => (item.id === data.subSkill.id ? data.subSkill : item))
-    );
+    try {
+      //thêm xp cho subskill
+      const data = await addXPToSubskill(groupId, subSkillId);
+      if (!data) return;
 
-    setSkills((prev) =>
-      prev.map((item) => (item.id === data.skill.id ? data.skill : item))
-    );
+      setSubskill((prev) =>
+        prev.map((item) => (item.id === data.subSkill.id ? data.subSkill : item))
+      );
+
+      // tăng level cho skill
+      let updatedSkill = data.skill;
+
+      if (Number(data.skill.exp) >= Number(data.skill.maxhp)) {
+        const levelUp = await increaseSkillLevel(data.skill.id);
+        if (levelUp?.resetXpSkill) {
+          updatedSkill = levelUp.resetXpSkill;
+        }
+      }
+
+      setSkills((prev) =>
+        prev.map((item) =>
+          item.id === updatedSkill.id ? updatedSkill : item
+        )
+      );
+
+    } finally {
+      xpRequestsInFlight.current.delete(groupId);
+    }
   };
 
   const decreaseXPToSubSkill = async (groupId, subSkillId) => {
@@ -43,7 +63,7 @@ export default function Skill() {
       prev.map((item) => (item.id === data.skill.id ? data.skill : item))
     );
   };
-    
+
   const toggleGroup = (bigSkillId) => {
     setCollapsedGroups((prev) => ({
       ...prev,

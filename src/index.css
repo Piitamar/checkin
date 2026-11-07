@@ -29,6 +29,11 @@
     var(--color-lightpink),
     var(--color-screenblue));
 
+  --background-image-peach-gold: linear-gradient(135deg,
+    var(--color-lightpink),
+    #e3dfd8,
+    #edebdf);
+
   --background-image-hazy: linear-gradient(350deg,
     color-mix(in oklab, var(--color-darkblue) 80%, transparent),
     color-mix(in oklab, var(--color-normalblue) 80%, transparent),

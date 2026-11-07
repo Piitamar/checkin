@@ -29,6 +29,7 @@ interface Window {
     getTodo: () => Promise<any>
     deleteTodo: (id: number) => Promise<any>
     markDoneTodo: (state: boolean, id: number) => Promise<any>
+    updateTrackOnly: (state: boolean, id: number) => Promise<any>
     fetchSkill: () => Promise<any>
     fetchSubskill: () => Promise<any>
     addSkill: (payload: { name: string; addPoints: number }) => Promise<any>

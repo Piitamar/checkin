@@ -23,9 +23,9 @@ export default function Calendar() {
           <button
             type='button'
             onClick={() => shiftMonth(-1)}
-            className='rounded-xl px-5 py-2 text-sm font-semibold text-darkblue transition hover:bg-white/50 hover:opacity-90'
+            className='rounded-xl px-5 py-2 text-sm font-semibold transition hover:bg-white/50 hover:opacity-90'
           >
-            Prev
+            ◀
           </button>
           <h1 className='text-base dark:text-lightwhite font-medium text-darkblue/80'>
             {weekDate}, ngày {date} tháng {month} năm {year}
@@ -33,9 +33,9 @@ export default function Calendar() {
           <button
             type='button'
             onClick={() => shiftMonth(1)}
-            className='rounded-xl px-5 py-2 text-sm font-semibold text-darkblue transition hover:bg-white/50 hover:opacity-90'
+            className='rounded-xl px-5 py-2 text-sm font-semibold transition hover:bg-white/50 hover:opacity-90'
           >
-            Next
+            ▶
           </button>
         </div>
 

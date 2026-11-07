@@ -44,16 +44,16 @@ function createWindow() {
 
 //Cổng post todo
 ipcMain.handle('add-todo', async (_event, todoData) => {
-  const todo  = todoData
+  const todo = typeof todoData?.todo === 'string' ? todoData.todo.trim() : ''
   //Chặn null value
-  if (!todo || todo.trim() == '') {
+  if (!todo) {
      return {success: false, error: 'Please insert your note'}
   }
   //Lưu vào db
   try {
     const res = await pool.query(
-      'INSERT INTO checkin (todo) VALUES ($1) RETURNING *',
-      [todo],
+      'INSERT INTO checkin (todo, track_only) VALUES ($1, $2) RETURNING *',
+      [todo, Boolean(todoData.trackOnly)],
     )
     return { success: true, data: res.rows[0] }
   } catch (err: unknown) {
@@ -65,8 +65,11 @@ ipcMain.handle('add-todo', async (_event, todoData) => {
 ipcMain.handle('get-todo', async () => {
   try {
     const res = await pool.query(
-      'SELECT * FROM checkin ORDER BY created_at DESC'
-    )
+      `SELECT *
+      FROM checkin
+      WHERE created_at >= NOW() - INTERVAL '20 days'
+      ORDER BY created_at DESC
+    `)
     return res.rows 
   } catch (err: unknown) {
     return {success: false, error: (err as Error).message}
@@ -92,6 +95,21 @@ ipcMain.handle('markDone-todo', async (_event, state, id) => {
     const res = await pool.query(
       'UPDATE checkin SET markdone = $1 WHERE id = $2 RETURNING *', [state, id]
     )
+    return { success: true, data: res.rows[0] }
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message }
+  }
+})
+
+ipcMain.handle('update-track-only', async (_event, state, id) => {
+  try {
+    const res = await pool.query(
+      'UPDATE checkin SET track_only = $1 WHERE id = $2 RETURNING *',
+      [state, id],
+    )
+    if (!res.rows[0]) {
+      return { success: false, error: 'Todo not found' }
+    }
     return { success: true, data: res.rows[0] }
   } catch (err: unknown) {
     return { success: false, error: (err as Error).message }
@@ -342,6 +360,46 @@ ipcMain.handle('decrease-xp-to-subskill', async (_, groupId, subSkillId) => {
       data: {
         skill: updatedSkill,
         subSkill: updatedSubSkill,
+      },
+    }
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message }
+  }
+})
+
+//cổng tăng level cho skill group
+ipcMain.handle('increase-skill-level', async (_, skillId) => {
+  try {
+    const {
+      rows: [skill],
+    } = await pool.query(
+      'SELECT * FROM skill WHERE id = $1',
+      [skillId],
+    )
+
+    if (!skill) {
+      return { success: false, error: 'Skill not found' }
+    }
+
+    const {
+      rows: [updatedSkill],
+    } = await pool.query(
+      'UPDATE skill SET level = $1 WHERE id = $2 RETURNING *',
+      [skill.level + 1, skillId],
+    )
+
+    const {
+      rows: [resetXpSkill],
+    } = await pool.query(
+      'UPDATE skill SET exp = 0 WHERE id = $1 RETURNING *',
+      [skillId],
+    )
+
+    return {
+      success: true,
+      data: {
+        skill: updatedSkill,
+        resetXpSkill: resetXpSkill,
       },
     }
   } catch (err: unknown) {

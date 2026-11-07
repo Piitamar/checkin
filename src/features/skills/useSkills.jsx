@@ -80,5 +80,15 @@ export default function useSkills() {
     return null
   }
 
-return { fetchSkills, fetchSubskills, addSkill, deleteSkill, addSubskill, deleteSubskill, addXPToSubskill, decreaseXPToSubskill }
+  async function increaseSkillLevel(skillId) {
+    const result = await window.api.increaseSkillLevel(skillId)
+    if (result?.success) {
+      return result.data
+    }
+
+    console.error(result)
+    return null
+  }
+
+return { fetchSkills, fetchSubskills, addSkill, deleteSkill, addSubskill, deleteSubskill, addXPToSubskill, decreaseXPToSubskill, increaseSkillLevel }
 }
