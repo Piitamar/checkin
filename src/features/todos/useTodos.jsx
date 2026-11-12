@@ -1,3 +1,5 @@
+import { useCallback } from 'react'
+
 export default function useTodos() {
 
   async function loadTodos() {
@@ -8,6 +10,16 @@ export default function useTodos() {
     console.error(result)
     return []
   }
+
+  const loadAllTodos = useCallback(async () => {
+    const result = await window.api.getAllTodos()
+    if (Array.isArray(result)) {
+      return result
+    }
+
+    console.error(result)
+    return []
+  }, [])
 
   async function createTodo(text, trackOnly) {
     const result = await window.api.addTodo({ todo: text, trackOnly });
@@ -41,5 +53,5 @@ export default function useTodos() {
     return { success: false, error: result.error }
   }
 
-  return {createTodo, loadTodos, deleteTodo, markDoneTodo, updateTrackOnly }
+  return {createTodo, loadTodos, loadAllTodos, deleteTodo, markDoneTodo, updateTrackOnly }
 }

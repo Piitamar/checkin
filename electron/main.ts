@@ -77,6 +77,17 @@ ipcMain.handle('get-todo', async () => {
 })
 
 //Cổng xóa
+ipcMain.handle('get-all-todos', async () => {
+  try {
+    const res = await pool.query(
+      'SELECT * FROM checkin ORDER BY created_at DESC',
+    )
+    return res.rows
+  } catch (err: unknown) {
+    return { success: false, error: (err as Error).message }
+  }
+})
+
 ipcMain.handle('delete-todo', async (_event, id) => {
   try {
     const res = await pool.query(

@@ -13,6 +13,7 @@
     "dist": "electron-builder"
   },
   "dependencies": {
+    "framer-motion": "^14.12.0",
     "pg": "^8.22.0",
     "pg-native": "^3.8.0",
     "react": "^18.2.0",

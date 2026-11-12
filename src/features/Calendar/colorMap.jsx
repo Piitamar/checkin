@@ -1,8 +1,19 @@
-import useTodo from '../todos/useTodo'
+import { useEffect, useState } from 'react'
 import useGroup from '../todos/useGroup'
+import useTodos from '../todos/useTodos'
 
 export default function useHeatmapData() {
-  const { todos } = useTodo()
+  const [todos, setTodos] = useState([])
+  const { loadAllTodos } = useTodos()
+
+  useEffect(() => {
+    async function loadData() {
+      setTodos(await loadAllTodos())
+    }
+
+    loadData()
+  }, [loadAllTodos])
+
   const groupData = useGroup({ todos })
 
   const heatmapData = {}

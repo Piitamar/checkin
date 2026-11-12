@@ -26,6 +26,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 contextBridge.exposeInMainWorld('api', {
   addTodo: (data: { todo: string, trackOnly: boolean }) => ipcRenderer.invoke('add-todo', data),
   getTodo: () => ipcRenderer.invoke('get-todo'),
+  getAllTodos: () => ipcRenderer.invoke('get-all-todos'),
   deleteTodo: (id: number) => ipcRenderer.invoke('delete-todo', id),
   markDoneTodo: (state: boolean, id: number) => ipcRenderer.invoke('markDone-todo', state, id),
   updateTrackOnly: (state: boolean, id: number) => ipcRenderer.invoke('update-track-only', state, id),

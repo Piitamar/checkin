@@ -1,16 +1,24 @@
 import OverlayEffect from "./SnowVfx";
 import { Link } from "react-router-dom";
-import Character from "./Character.jsx";
 
 export default function Game() {
+    const backgroundImage = ["./bg.png", "./bg2.png", "./bg3.png"];
+    const imageIndex = 1;
+    const characters = [
+        { name: "Cecilia", image: "./Cecilia.png" },
+        { name: "Andrian", image: "./andrian.png" },
+        { name: "Aiden", image: "./Aiden.png" },
+    ];
+    const characterImage = characters[0].image;
+
     return (
         <section className="relative overflow-hidden p-5 mx-[-32px] my-[-52px] bg-white w-screen h-[100vh]">
             <img
-                src="/bg.png"
+                src={backgroundImage[imageIndex]}
                 className="absolute inset-0 w-screen h-screen object-cover"
             />
 
-            <OverlayEffect src="/snow.webm" className="mix-blend-screen" />
+            <OverlayEffect src="./snow.webm" className="mix-blend-screen" />
 
             {/* TOP BAR */}
             <div className="top-bar relative z-20 w-full h-20 flex justify-between items-center px-5">
@@ -51,11 +59,11 @@ export default function Game() {
                     </div>
 
                     <div className="top-actions flex items-center gap-2">
-                        <button className="shop w-11 h-11 text-whiterounded-lg bg-white/10 hover:bg-white/20 transition">
+                        <button className="shop w-11 h-11 text-white rounded-lg hover:bg-white/20 transition">
                             🛒
                         </button>
 
-                        <button className="settings w-11 h-11 text-whiterounded-lg bg-white/10 hover:bg-white/20 transition">
+                        <button className="settings w-11 h-11 text-white rounded-lg hover:bg-white/20 transition">
                             ⚙
                         </button>
                     </div>
@@ -67,27 +75,24 @@ export default function Game() {
                 <div className="center relative flex-1 pl-7">
                     <Link to="/">
                         <button className="relative z-30 text-white hover:scale-105 transition duration-300">
-                            Back
+                            ◀
                         </button>
                     </Link>
                 </div>
 
-                <div className="character absolute top-15 left-0">
+                <div className="character absolute top-15 left-[-100px] ">
                     <img
-                        src="/character-Photoroom.png"
-                        className="bottom-0 size-1/2 right-20"
+                        src={characterImage}
+                        className="bottom-0 size-3/4 right-20"
                     />
                 </div>
 
                 {/* RIGHT PANEL */}
-                <div className="right-panel relative flex-end flex flex-col w-120 h-80 p-2 gap-2">
+                <div className="right-panel relative flex-end flex flex-col w-90 h-80 p-2 gap-2">
                     <div className="story-card relative h-[35%] border border-white/20 bg-navyblue/40 p-4 text-white">
                         <div className="h-full flex flex-col justify-end">
                             <span className="text-xs tracking-[0.25em] opacity-80">
                                 STORY
-                            </span>
-                            <span className="text-xl font-semibold">
-                                [ STORY IMAGE ]
                             </span>
                             <span className="text-sm opacity-80">
                                 Chapter 4 — Ashes of the Past
@@ -96,20 +101,14 @@ export default function Game() {
                     </div>
 
                     <div className="feature-grid grid grid-cols-2 gap-2 flex-1">
-                        <div className="gacha-card border h-[55%] border-white/20 bg-navyblue/40 p-3 text-white flex flex-col justify-between">
-                            <span className="text-sm tracking-widest">GACHA</span>
-                            <div>
-                                <p className="font-semibold">[ GACHA IMAGE ]</p>
-                                <p className="text-xs opacity-80">Recruit</p>
+                        <Link to="/gacha">
+                            <div className="gacha-card border h-[55%] border-white/20 bg-navyblue/40 p-3 text-white flex flex-col justify-between transition">
+                                <span className="text-sm tracking-widest">GACHA</span>
                             </div>
-                        </div>
+                        </Link>
 
                         <div className="character-card border h-[55%] border-white/20 bg-navyblue/40 p-3 text-white flex flex-col justify-between">
                             <span className="text-sm tracking-widest">CHARACTERS</span>
-                            <div>
-                                <p className="font-semibold">[ CHARACTER IMAGE ]</p>
-                                <p className="text-xs opacity-80">List</p>
-                            </div>
                         </div>
 
                         <div className="hidden inventory-card border border-white/20 bg-navyblue/40 p-3 text-white flex flex-col justify-between">
@@ -132,7 +131,7 @@ export default function Game() {
             </div>
 
             {/* BOTTOM NAV */}
-            <div className="bottom-nav fixed inset-x-5 mx-2 my-5 bottom-0 z-20 flex h-20 justify-center border border-white/30 bg-navyblue/20 backdrop-blur-sm">
+            <div className="bottom-nav fixed inset-x-5 mx-[-30px] my-5 bottom-0 z-20 flex h-17 justify-center border border-white/20 bg-navyblue/30 backdrop-blur-xs">
                 <div className="flex items-center gap-8 text-white">
                     <button className="flex flex-col items-center gap-1 hover:scale-105 transition">
                         <span className="text-xl">⌂</span>
@@ -141,17 +140,7 @@ export default function Game() {
 
                     <button className="flex flex-col items-center gap-1 hover:scale-105 transition">
                         <span className="text-xl">⚔</span>
-                        <span className="text-sm">QUEST</span>
-                    </button>
-
-                    <button className="flex flex-col items-center gap-1 hover:scale-105 transition">
-                        <span className="text-xl">⚔</span>
                         <span className="text-sm">BATTLE</span>
-                    </button>
-
-                    <button className="flex flex-col items-center gap-1 hover:scale-105 transition">
-                        <span className="text-xl">♢</span>
-                        <span className="text-sm">GUILD</span>
                     </button>
 
                     <button className="flex flex-col items-center gap-1 hover:scale-105 transition">

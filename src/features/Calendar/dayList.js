@@ -2,7 +2,8 @@ const weekDays = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ N
 
 export function getMonthCalendar(year, month) {
   const now = new Date()
-  const weekday = new Date(year, month - 1, 1).getDay() - 1
+  // Calendar columns run Monday to Sunday; JavaScript starts weeks on Sunday.
+  const weekday = (new Date(year, month - 1, 1).getDay() + 6) % 7
   const daysInMonth = new Date(year, month, 0).getDate()
   const dayList = []
 

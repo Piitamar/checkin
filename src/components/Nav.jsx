@@ -1,16 +1,13 @@
-import { useEffect, useState } from "react";
 import { FaMoon, FaCloud } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import useSkill from "../features/skills/useSkill";
 
 export default function Nav({ mode, toggle }) {
   const { skills } = useSkill();
-  const [gold, setGold] = useState(0);
-
-  useEffect(() => {
-    const totalSkillExp = skills.reduce((sum, skill) => sum + Number(skill.exp + (skill.level - 1) * 1000) || 0, 0);
-    setGold(totalSkillExp);
-  }, [skills]);
+  const gold = skills.reduce(
+    (sum, skill) => sum + Number(skill.exp || 0) + (Number(skill.level || 1) - 1) * 1000,
+    0,
+  );
 
   return (
     <nav className="flex h-5 w-full items-center justify-between">

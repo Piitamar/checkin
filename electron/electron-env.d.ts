@@ -27,6 +27,7 @@ interface Window {
   api: {
     addTodo: (data: { todo: string }) => Promise<any>
     getTodo: () => Promise<any>
+    getAllTodos: () => Promise<any>
     deleteTodo: (id: number) => Promise<any>
     markDoneTodo: (state: boolean, id: number) => Promise<any>
     updateTrackOnly: (state: boolean, id: number) => Promise<any>

@@ -9,6 +9,7 @@ export default function Calendar() {
   const [year, setYear] = useState(currentYear)
 
   const { dayList, date, weekDate } = getMonthCalendar(year, month)
+  const isCurrentMonth = year === currentYear && month === currentMonth
 
   const shiftMonth = (offset) => {
     const nextDate = new Date(year, month - 1 + offset, 1)
@@ -28,7 +29,9 @@ export default function Calendar() {
             ◀
           </button>
           <h1 className='text-base dark:text-lightwhite font-medium text-darkblue/80'>
-            {weekDate}, ngày {date} tháng {month} năm {year}
+            {isCurrentMonth
+              ? `${weekDate}, ngày ${date} tháng ${month} năm ${year}`
+              : `tháng ${month} năm ${year}`}
           </h1>
           <button
             type='button'

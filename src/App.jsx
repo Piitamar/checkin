@@ -7,6 +7,8 @@ import Skill from './features/skills/Skill.jsx';
 import Focus from './features/focus/Focus.jsx';
 import Popup from './components/Popup.jsx';
 import Game from './game/Game.jsx';
+import Gacha from './game/Gacha.jsx';
+import { SkillsProvider } from './features/skills/useSkill.jsx';
 
 function PersistentFocus() {
   const location = useLocation();
@@ -53,6 +55,7 @@ export default function App() {
   //--------MAIN----------------------------------------------------
   return (
     <HashRouter>
+      <SkillsProvider>
       {location.pathname !== "#/popup" && window.location.hash !== "#/Game" && (
         <Nav mode={mode} toggle={toggle} />
       )}
@@ -65,8 +68,10 @@ export default function App() {
           <Route path='/Calendar' element={<Calendar />} />
           <Route path='/Skill' element={<Skill />} />
           <Route path='/Game' element={<Game />} />
+          <Route path='/Gacha' element={<Gacha />} />
         </Routes>
       </div>
+      </SkillsProvider>
     </HashRouter>
   )
 }
