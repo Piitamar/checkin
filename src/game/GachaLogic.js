@@ -1,6 +1,7 @@
 
 export const GACHA_CONFIG = {
     fiveStarBaseRate: 0.005,
+    softPityStart: 20,
     hardPity: 25,
     featuredChance: 0.5,
 };
@@ -19,12 +20,31 @@ const getCharacterPool = (characters, rarity) =>
     characters.filter((character) => character.rarity === rarity);
 
 // Tỷ lệ xuất hiện 5 sao
-const getFiveStarRate = (nextPity) => {
-    if (nextPity >= GACHA_CONFIG.hardPity) {
+export const getFiveStarRate = (nextPity) => {
+    const {
+        fiveStarBaseRate,
+        softPityStart,
+        hardPity,
+    } = GACHA_CONFIG;
+
+    if (nextPity >= hardPity) {
         return 1;
     }
 
-    return GACHA_CONFIG.fiveStarBaseRate;
+    if (nextPity < softPityStart) {
+        return fiveStarBaseRate;
+    }
+
+    // Tỷ lệ tăng dần theo từng lượt
+    const softPityRates = [
+        0.02, // Roll 20: 2%
+        0.05, // Roll 21: 5%
+        0.12, // Roll 22: 12%
+        0.25, // Roll 23: 25%
+        0.50, // Roll 24: 50%
+    ];
+
+    return softPityRates[nextPity - softPityStart];
 };
 
 // Roll một lượt

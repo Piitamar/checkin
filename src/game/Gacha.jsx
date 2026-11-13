@@ -1,9 +1,14 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
+
 import OverlayEffect from "./SnowVfx";
 import AstralSummonAnimation from "./Animation";
-import { pullOnce, pullMany } from "./GachaLogic";
+
+import { pullMany } from "./GachaLogic";
+
+import GachaReveal from "./GachaReveal";
+import GachaSummary from "./GachaSummary";
 
 const characters = [
     {
@@ -11,14 +16,22 @@ const characters = [
         name: "Cecilia",
         title: "The Wandering Astrologist",
         image: "/cecilia2.png",
+        imageRoll: "/cecilia.png",
         rarity: 5,
+        traits: ["Astral", "Astrologist"],
+        quote: "Every star has a story. Some are simply waiting to be discovered.",
+        description: "A wandering astrologist.",
     },
     {
         id: "adrian",
         name: "Adrian",
         title: "The Master Architect",
         image: "/andrian2.png",
+        imageRoll: "/andrian.png",
         rarity: 4,
+        traits: ["Geo", "Architect"],
+        quote: "Structures are merely a language. What I build is a place for people to live, to dream.",
+        description: "A master architect.",
     },
 ];
 
@@ -27,79 +40,242 @@ export default function Gacha() {
     const [tickets, setTickets] = useState(100);
     const [message, setMessage] = useState("");
 
-    //animation 
+    // Animation
     const [showSummon, setShowSummon] = useState(false);
     const [summonRarity, setSummonRarity] = useState("5star");
 
-    //PULL
+    // Gacha logic
     const [pity, setPity] = useState(0);
     const [guaranteedFeatured, setGuaranteedFeatured] = useState(false);
     const [summonResults, setSummonResults] = useState([]);
 
-    const selected = characters.find(
-        (item) => item.id === selectedId
-    ) || characters[0];
+    // Character reveal
+    const [showReveal, setShowReveal] = useState(false);
+    const [revealIndex, setRevealIndex] = useState(0);
+
+    // Summary
+    const [showSummary, setShowSummary] = useState(false);
+
+    // View character again from summary
+    const [selectedReveal, setSelectedReveal] = useState(null);
+
+    // Current selected banner
+    const selected =
+        characters.find((item) => item.id === selectedId) || characters[0];
+
+    // =====================================
+    // HANDLE ROLL
+    // =====================================
 
     const handleRoll = (amount) => {
+        if (![1, 10].includes(amount)) {
+            return;
+        }
+
         if (tickets < amount) {
             setMessage("Not enough tickets.");
             return;
         }
 
-        // Thực hiện roll x1 hoặc x10
+        // Execute pulls
         const result = pullMany({
             amount,
-            characters: characters,
+            characters,
             pity,
             guaranteedFeatured,
             featuredCharacterId: "cecilia",
         });
 
-        // Cập nhật pity và 50/50
+        // Update pity and guarantee
         setPity(result.pity);
         setGuaranteedFeatured(result.guaranteedFeatured);
 
-        // Lưu kết quả
+        // Save results
         setSummonResults(result.results);
 
-        // Trừ vé
+        // Deduct tickets
         setTickets((prev) => prev - amount);
 
-        // Xác định rarity cao nhất để chạy animation
+        // Reset all previous screens
+        setRevealIndex(0);
+        setShowReveal(false);
+        setShowSummary(false);
+        setSelectedReveal(null);
+        setShowSummon(false);
+        setMessage("");
+
+        // Determine highest rarity
         const highestRarity = Math.max(
             ...result.results.map((character) => character.rarity)
         );
 
-        setSummonRarity(highestRarity === 5 ? "5star" : "4star");
+        setSummonRarity(
+            highestRarity >= 5 ? "5star" : "4star"
+        );
 
-        setMessage("");
+        // ALWAYS start animation first
         setShowSummon(true);
     };
 
+    // =====================================
+    // ANIMATION COMPLETE
+    // =====================================
+
+    const handleAnimationComplete = () => {
+        setShowSummon(false);
+        setRevealIndex(0);
+
+        // Show first character
+        setShowReveal(true);
+    };
+
+    // =====================================
+    // CONTINUE CHARACTER REVEAL
+    // =====================================
+
+    const handleContinue = () => {
+        const isLastCharacter =
+            revealIndex >= summonResults.length - 1;
+
+        if (!isLastCharacter) {
+            // Next character
+            setRevealIndex((prev) => prev + 1);
+            return;
+        }
+
+        // Last character reached
+        setShowReveal(false);
+        setRevealIndex(0);
+
+        // X10 -> Summary
+        if (summonResults.length === 10) {
+            setShowSummary(true);
+        }
+    };
+
+    // =====================================
+    // SKIP REMAINING REVEALS
+    // =====================================
+
+    const handleSkip = () => {
+        setShowReveal(false);
+        setRevealIndex(0);
+
+        // X10 -> Go directly to summary
+        if (summonResults.length === 10) {
+            setShowSummary(true);
+        }
+    };
+
+    // =====================================
+    // CLOSE SUMMARY
+    // =====================================
+
+    const handleConfirmSummary = () => {
+        setShowSummary(false);
+        setSummonResults([]);
+    };
+
+    // =====================================
+    // RECRUIT AGAIN
+    // =====================================
+
+    const handleRecruitAgain = () => {
+        handleRoll(10);
+    };
+
+    // =====================================
+    // VIEW CHARACTER FROM SUMMARY
+    // =====================================
+
+    const handleSelectCharacter = (character) => {
+        setSelectedReveal(character);
+        setShowSummary(false);
+    };
+
+    const handleCloseSelectedReveal = () => {
+        setSelectedReveal(null);
+        setShowSummary(true);
+    };
+
     return (
-        <section className="relative overflow-hidden p-2 mx-[-32px] my-[-52px]  w-screen h-[100vh] bg-[#0b1420] text-[#eee9dc] flex flex-col">
+        <section className="relative overflow-hidden p-2 mx-[-32px] my-[-52px] w-screen h-[100vh] bg-[#0b1420] text-[#eee9dc] flex flex-col">
+
+            {/* ================================= */}
+            {/* SUMMON ANIMATION */}
+            {/* ================================= */}
 
             {showSummon && (
                 <AstralSummonAnimation
                     backgroundImage="/book.png"
                     rarity={summonRarity}
-                    onComplete={() => {
-                        setShowSummon(false);
-                    }}
+                    onComplete={handleAnimationComplete}
                 />
             )}
 
+            {/* ================================= */}
+            {/* CHARACTER REVEAL */}
+            {/* ================================= */}
+
+            {showReveal && summonResults.length > 0 && (
+                <GachaReveal
+                    character={summonResults[revealIndex]}
+                    showSkip={summonResults.length === 10}
+                    onContinue={handleContinue}
+                    onSkip={handleSkip}
+                />
+            )}
+
+            {/* ================================= */}
+            {/* GACHA SUMMARY */}
+            {/* ================================= */}
+
+            {showSummary && (
+                <GachaSummary
+                    results={summonResults}
+                    onConfirm={handleConfirmSummary}
+                    onRecruitAgain={handleRecruitAgain}
+                    onSelectCharacter={handleSelectCharacter}
+                />
+            )}
+
+            {/* ================================= */}
+            {/* SELECTED CHARACTER REVEAL */}
+            {/* ================================= */}
+
+            {selectedReveal && (
+                <GachaReveal
+                    character={selectedReveal}
+                    showSkip={false}
+                    onContinue={handleCloseSelectedReveal}
+                    onSkip={handleCloseSelectedReveal}
+                />
+            )}
+
+            {/* ================================= */}
             {/* BACKGROUND */}
+            {/* ================================= */}
+
             <img
                 src="/bg2.png"
                 alt=""
                 className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-[#08111b]/65" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#080e18]/80 via-transparent to-[#080e18]/30" />
-            <OverlayEffect src="/dust.mp4" videoSpeed={0.5} className="opacity-20" />
 
+            <div className="absolute inset-0 bg-[#08111b]/65" />
+
+            <div className="absolute inset-0 bg-gradient-to-t from-[#080e18]/80 via-transparent to-[#080e18]/30" />
+
+            <OverlayEffect
+                src="/dust.mp4"
+                videoSpeed={0.5}
+                className="opacity-20"
+            />
+
+            {/* ================================= */}
             {/* HEADER */}
+            {/* ================================= */}
+
             <header className="relative z-30 h-[50px] mx-[-10px] pb-2 shrink-0 px-[clamp(16px,3vw,40px)] flex items-center justify-between border-b border-[#c6b98f]/20">
 
                 <div className="flex items-center gap-3">
@@ -114,6 +290,7 @@ export default function Gacha() {
                         <h2 className="font-serif text-[20px]">
                             Recruitment
                         </h2>
+
                         <p className="text-[7px] tracking-[0.3em] text-[#c6b98f]">
                             THE ASTRAL ARCHIVE
                         </p>
@@ -143,26 +320,34 @@ export default function Gacha() {
                 </div>
             </header>
 
+            {/* ================================= */}
             {/* MOBILE CHARACTER SELECT */}
+            {/* ================================= */}
+
             <div className="relative z-20 flex md:hidden gap-2 px-4 pt-3">
                 {characters.map((character) => (
                     <button
                         key={character.id}
                         onClick={() => setSelectedId(character.id)}
-                        className={`px-4 py-2 rounded-md text-xs border ${selectedId === character.id
-                            ? "border-[#d8bd86] bg-[#b59b69]/20 text-[#e6d1a2]"
-                            : "border-white/20 bg-[#101b29]/80 text-white/60"
-                            }`}
+                        className={`px-4 py-2 rounded-md text-xs border ${
+                            selectedId === character.id
+                                ? "border-[#d8bd86] bg-[#b59b69]/20 text-[#e6d1a2]"
+                                : "border-white/20 bg-[#101b29]/80 text-white/60"
+                        }`}
                     >
                         {character.name}
                     </button>
                 ))}
             </div>
 
+            {/* ================================= */}
             {/* MAIN CONTENT */}
+            {/* ================================= */}
+
             <main className="relative z-30 flex-1 min-h-0 grid grid-cols-[clamp(115px,17vw,190px)_minmax(0,1fr)] max-md:grid-cols-1 gap-4 md:gap-5 p-[clamp(12px,2vw,28px)]">
 
                 {/* SIDEBAR */}
+
                 <aside className="hidden md:flex flex-col gap-3 min-h-0">
 
                     <p className="text-[10px] tracking-[0.25em] text-[#c6b98f] mb-1">
@@ -179,10 +364,11 @@ export default function Gacha() {
                                     setSelectedId(character.id);
                                     setMessage("");
                                 }}
-                                className={`relative h-[100px] shrink-0 overflow-hidden rounded-lg border text-left transition ${active
-                                    ? "border-[#d8bd86] shadow-[0_0_15px_rgba(214,184,123,0.2)]"
-                                    : "border-white/20 opacity-65 hover:opacity-100"
-                                    }`}
+                                className={`relative h-[100px] shrink-0 overflow-hidden rounded-lg border text-left transition ${
+                                    active
+                                        ? "border-[#d8bd86] shadow-[0_0_15px_rgba(214,184,123,0.2)]"
+                                        : "border-white/20 opacity-65 hover:opacity-100"
+                                }`}
                             >
                                 <img
                                     src={character.thumbnail || character.image}
@@ -208,15 +394,16 @@ export default function Gacha() {
                             </button>
                         );
                     })}
-
                 </aside>
 
                 {/* BANNER */}
+
                 <div className="relative min-w-0 min-h-0 flex flex-col">
 
                     <div className="relative flex-1 min-h-0 overflow-hidden rounded-xl border border-[#c6b98f]/45 bg-[#111c2a]/70 shadow-xl">
 
                         {/* CHARACTER ART */}
+
                         <img
                             key={selected.id}
                             src={selected.image}
@@ -225,16 +412,18 @@ export default function Gacha() {
                         />
 
                         {/* LEFT TEXT PROTECTION */}
+
                         <div className="absolute inset-0 bg-gradient-to-r from-[#080d18]/25 via-[#080d18]/5 via-15% to-transparent" />
 
                         {/* BANNER TEXT */}
+
                         <div className="absolute inset-y-0 left-0 z-10 w-[52%] flex flex-col justify-center px-[clamp(16px,3vw,42px)]">
 
                             <p className="text-[10px] md:text-xs tracking-[0.3em] text-[#d6bd86] mb-5">
                                 ✧ LIMITED RECRUITMENT
                             </p>
 
-                            <h2 className="font-serif  italic text-[clamp(32px,4vw,64px)] leading-tight">
+                            <h2 className="font-serif italic text-[clamp(32px,4vw,64px)] leading-tight">
                                 {selected.name}
                             </h2>
 
@@ -255,14 +444,15 @@ export default function Gacha() {
                                     ★★★★★
                                 </p>
                             </div>
-
                         </div>
-
                     </div>
 
+                    {/* ================================= */}
                     {/* ROLL BUTTONS */}
+                    {/* ================================= */}
+
                     <section className="relative z-20 pt-3 shrink-0 h-[60px] flex items-center justify-end gap-4 bg-[#0b1420]/35 backdrop-blur-sm">
-                        {/* DETAILS */}
+
                         <div className="h-9 shrink-0 flex justify-end items-center">
                             <button className="text-xs text-[#d1bc8b]/70 hover:text-[#e7d3a6]">
                                 Details ↗
@@ -271,14 +461,16 @@ export default function Gacha() {
 
                         <button
                             onClick={() => handleRoll(1)}
-                            className="w-[100px] font-serif text-sm max-w-[20%] h-[40px] rounded-full border border-[#d0c4a5]/80 bg-gradient-to-b from-[#eee5d4] to-[#b9b2a9] text-[#263040] shadow-lg hover:brightness-110 transition"
+                            disabled={showSummon || showReveal || showSummary || !!selectedReveal}
+                            className="w-[100px] font-serif text-sm max-w-[20%] h-[40px] rounded-full border border-[#d0c4a5]/80 bg-gradient-to-b from-[#eee5d4] to-[#b9b2a9] text-[#263040] shadow-lg hover:brightness-110 transition disabled:opacity-50"
                         >
                             Recruit ×1
                         </button>
 
                         <button
                             onClick={() => handleRoll(10)}
-                            className="w-[100px] font-serif text-sm max-w-[20%] h-[40px] rounded-full border border-[#e2c58c] bg-gradient-to-b from-[#f2dba8] to-[#b99559] text-[#382d1c] shadow-[0_0_18px_rgba(217,181,113,0.2)] hover:brightness-110 transition"
+                            disabled={showSummon || showReveal || showSummary || !!selectedReveal}
+                            className="w-[100px] font-serif text-sm max-w-[20%] h-[40px] rounded-full border border-[#e2c58c] bg-gradient-to-b from-[#f2dba8] to-[#b99559] text-[#382d1c] shadow-[0_0_18px_rgba(217,181,113,0.2)] hover:brightness-110 transition disabled:opacity-50"
                         >
                             Recruit ×10
                         </button>
@@ -286,15 +478,16 @@ export default function Gacha() {
                 </div>
             </main>
 
+            {/* ================================= */}
             {/* MESSAGE */}
-            {
-                message && (
-                    <div className="absolute z-50 bottom-[100px] left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg border border-[#c58d78]/40 bg-[#151b25]/95 text-xs text-[#e8b9a5] whitespace-nowrap">
-                        {message}
-                    </div>
-                )
-            }
+            {/* ================================= */}
 
-        </section >
+            {message && (
+                <div className="absolute z-50 bottom-[100px] left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg border border-[#c58d78]/40 bg-[#151b25]/95 text-xs text-[#e8b9a5] whitespace-nowrap">
+                    {message}
+                </div>
+            )}
+
+        </section>
     );
 }

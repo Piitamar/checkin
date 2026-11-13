@@ -5,7 +5,7 @@ export default function Game() {
     const backgroundImage = ["./bg.png", "./bg2.png", "./bg3.png"];
     const imageIndex = 1;
     const characters = [
-        { name: "Cecilia", image: "./Cecilia.png" },
+        { name: "Cecilia", image: "./cecilia.png" },
         { name: "Andrian", image: "./andrian.png" },
         { name: "Aiden", image: "./Aiden.png" },
     ];
